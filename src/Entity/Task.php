@@ -6,6 +6,7 @@ use App\Repository\TaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
 class Task
 {
@@ -23,14 +24,11 @@ class Task
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTime $deadline = null;
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $CreatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $CreatedAt = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $ModifiedAt = null;
+    private ?\DateTime $UpdatedAt = null;
 
     public function getId(): ?int
     {
@@ -80,39 +78,43 @@ class Task
         return $this;
     }
 
-    public function getDeadline(): ?\DateTime
+    #[ORM\PrePersist]
+    public function onCreatedAt(): static
     {
-        return $this->deadline;
-    }
-
-    public function setDeadline(?\DateTime $deadline): static
-    {
-        $this->deadline = $deadline;
-
+        $this->CreatedAt = new \DateTime("now");
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+
+    public function getCreatedAt(): ?\DateTime
     {
         return $this->CreatedAt;
     }
 
-    public function setCreatedAt(?\DateTimeImmutable $CreatedAt): static
+    public function setCreatedAt(?\DateTime $CreatedAt): static
     {
         $this->CreatedAt = $CreatedAt;
 
         return $this;
     }
 
-    public function getModifiedAt(): ?\DateTimeImmutable
+    #[ORM\PreUpdate]
+    public function onUpdatedAt(): static
     {
-        return $this->ModifiedAt;
+        $this->UpdatedAt = new \DateTime("now");
+        return $this;
     }
 
-    public function setModifiedAt(?\DateTimeImmutable $ModifiedAt): static
+    public function getUpdatedAt(): ?\DateTime
     {
-        $this->ModifiedAt = $ModifiedAt;
+        return $this->UpdatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTime $UpdatedAt): static
+    {
+        $this->UpdatedAt = $UpdatedAt;
 
         return $this;
     }
+
 }
