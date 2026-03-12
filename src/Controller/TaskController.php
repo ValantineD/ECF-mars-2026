@@ -15,10 +15,16 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TaskController extends AbstractController
 {
     #[Route(name: 'task_index', methods: ['GET'])]
-    public function index(TaskRepository $taskRepository): Response
+    public function index(TaskRepository $taskRepository, Request $request): Response
     {
+
+        $status= $request->query->get("status");
+
+        $tasks = $status ? $taskRepository->findBy(['status' => $status]) : $taskRepository->findAll();
+
         return $this->render('task/index.html.twig', [
-            'tasks' => $taskRepository->findAll(),
+            'tasks' => $tasks,
+            'status' => $status,
         ]);
     }
 
@@ -63,10 +69,30 @@ final class TaskController extends AbstractController
     #[Route('/{id}', name: 'task_delete', methods: ['POST'])]
     public function delete(Request $request, Task $task, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$task->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $task->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($task);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('task_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['GET', 'POST'])]
+    public function toggle(Task $task, EntityManagerInterface $entityManager): Response
+    {
+
+        $status = $task->getStatus();
+
+        if ($status == "To Do") {
+            $task->setStatus("Completed");
+            $entityManager->persist($status);
+            $entityManager->flush();
+        } else {
+            $task->setStatus("To Do");
+            $entityManager->persist($status);
+            $entityManager->flush();
+        }
+
 
         return $this->redirectToRoute('task_index', [], Response::HTTP_SEE_OTHER);
     }

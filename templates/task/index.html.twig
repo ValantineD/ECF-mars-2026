@@ -3,36 +3,32 @@
 {% block title %}Task index{% endblock %}
 
 {% block body %}
+    <div class="container">
+
     <h1>Task index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.title }}</td>
-                <td>{{ task.description }}</td>
-                <td>{{ task.status }}</td>
-                <td>{{ task.createdAt ? task.createdAt|date('Y-m-d H:i') : '' }}</td>
-                <td>
-                    <a href="{{ path('task_edit', {'id': task.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no task yet!</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ path('task_index') }}">All</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('task_index', {status: "To Do" })}}">To Do</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ path('task_index', {status: "Completed" })}}">Completed</a>
+            </li>
+        </ul>
 
-    <a href="{{ path('task_new') }}">Create new Task</a>
+    <section>
+        <div>
+        <a class="btn btn-primary" href="{{ path('task_new') }}">Create new Task</a>
+        </div>
+        <div class="d-flex flex-wrap gap-5">
+            {% for task in tasks %}
+                {{ include('partials/_card.html.twig', {'task': task}) }}
+            {% else %}
+                <p> no task yet!</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}
