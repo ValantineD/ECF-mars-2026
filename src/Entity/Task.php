@@ -22,7 +22,7 @@ class Task
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $status = null;
+    private ?string $status = "IN_PROGRESS";
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $CreatedAt = null;

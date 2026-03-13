@@ -10,6 +10,7 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        # used to reload user from session & other features (e.g. switch_user)
 
     firewalls:
         dev:
@@ -27,9 +28,10 @@ security:
             # switch_user: true
 
     # Note: Only the *first* matching rule is applied
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+#    access_control:
+#         - { path: ^/register, roles: PUBLIC_ACCESS }
+#         - { path: ^/login, roles: PUBLIC_ACCESS }
+#         - { path: ^/, roles: ROLE_USER }
 
 when@test:
     security:

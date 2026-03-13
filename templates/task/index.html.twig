@@ -9,13 +9,13 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{{ path('task_index') }}">All</a>
+                <a class="nav-link" aria-current="page" href="{{ path('task_index') }}">All</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ path('task_index', {status: "To Do" })}}">To Do</a>
+                <a class="nav-link {{ app.request.query.get('status') === "IN_PROGRESS" ? 'active' : ""  }}" href="{{ path('task_index', {status: "IN_PROGRESS" })}}">To Do</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ path('task_index', {status: "Completed" })}}">Completed</a>
+                <a class="nav-link {{ app.request.query.get('status') === "COMPLETED" ? 'active' : ""  }}" href="{{ path('task_index', {status: "COMPLETED" })}}">Completed</a>
             </li>
         </ul>
 

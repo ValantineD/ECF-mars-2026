@@ -8,6 +8,7 @@
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 import './styles/global.scss';
+import "./js/handle-change-status";
 
 // app.js
 
@@ -23,3 +24,4 @@ require('bootstrap');
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 });
+

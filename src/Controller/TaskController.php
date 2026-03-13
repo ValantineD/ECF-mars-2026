@@ -7,6 +7,7 @@ use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,15 +19,37 @@ final class TaskController extends AbstractController
     public function index(TaskRepository $taskRepository, Request $request): Response
     {
 
-        $status= $request->query->get("status");
+        $status = $request->query->get("status");
+        $title = $request->query->get("title");
 
         $tasks = $status ? $taskRepository->findBy(['status' => $status]) : $taskRepository->findAll();
+
+        $q = $request->query->get("q");
+
+        if ($q) {
+            $tasks = $taskRepository->findby(['title' => $title]);
+        }
 
         return $this->render('task/index.html.twig', [
             'tasks' => $tasks,
             'status' => $status,
         ]);
     }
+
+    #[Route(name: 'task_search', methods: ['POST', 'GET'])]
+    public function Search(TaskRepository $taskRepository, Request $request): Response
+    {
+        $query = $request->request->all('form')['query'];
+        if ($query) {
+            $articles = $taskRepository->findArticlesByName($query);
+            return $this->render('task/index.html.twig', [
+                'articles' => $articles
+            ]);
+        } else {
+            return $this->redirectToRoute('task_index');
+        }
+    }
+
 
     #[Route('/new', name: 'task_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -77,23 +100,22 @@ final class TaskController extends AbstractController
         return $this->redirectToRoute('task_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['GET', 'POST'])]
-    public function toggle(Task $task, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/toggle', name: 'task_toggle', methods: ['POST'])]
+    public function toggle(Task $task, EntityManagerInterface $entityManager): JsonResponse
     {
 
-        $status = $task->getStatus();
-
-        if ($status == "To Do") {
-            $task->setStatus("Completed");
-            $entityManager->persist($status);
-            $entityManager->flush();
+        if ($task->getStatus() === "IN_PROGRESS") {
+            $task->setStatus("COMPLETED");
         } else {
-            $task->setStatus("To Do");
-            $entityManager->persist($status);
-            $entityManager->flush();
+            $task->setStatus("IN_PROGRESS");
         }
 
+        $entityManager->persist($task);
+        $entityManager->flush();
 
-        return $this->redirectToRoute('task_index', [], Response::HTTP_SEE_OTHER);
+        return $this->json([
+            "success" => true,
+            "message" => "Task changed status"
+        ]);
     }
 }
